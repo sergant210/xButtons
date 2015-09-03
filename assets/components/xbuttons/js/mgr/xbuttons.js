@@ -86,9 +86,9 @@ Ext.onReady(function() {
 	var myBtn = new Ext.Button({
 		text: "<i class=\"icon icon-file-code-o icon-large\"></i>",
 		cls: "x-btn-text bmenu",
-		isonCls: '',
 		style: "marginRight: 5px",
 		menu: {
+			id: 'xbuttons-x-menu',
 			items: [{
 				text: _('xbuttons_load_from_file'),
 				handler: function() {
@@ -138,14 +138,27 @@ Ext.onReady(function() {
 /************************************************************/
 xButtons.window.SaveCode = function (config) {
 	config = config || {};
-	//var code = document.getElementsByClassName('ace_text-input')[0].value || document.getElementById(xButtons_config.field).value;
+
 	var aceEditor = document.getElementsByClassName('ace_editor')[0], code;
 	if (aceEditor) {
 		code = Ext.getCmp(aceEditor.id).getValue();
 	} else {
 		code = document.getElementById(xButtons_config.field).value;
 	}
-
+	switch (xButtons_config.element) {
+		case 'snippets':
+			name = document.getElementById('modx-snippet-name').value;
+			break;
+		case 'plugins':
+			name = document.getElementById('modx-plugin-name').value;
+			break;
+		case 'chunks':
+			name = document.getElementById('modx-chunk-name').value;
+			break;
+		case 'templates':
+			name = document.getElementById('modx-template-templatename').value;
+			break;
+	}
 	Ext.applyIf(config, {
 		width: 300,
 		title: _('xbuttons_file_name'),
@@ -165,8 +178,14 @@ xButtons.window.SaveCode = function (config) {
 			xtype: 'textfield',
 			name: 'name',
 			allowBlank: false,
+			value: name || '',
 			fieldLabel: _('xbuttons_enter_file_name'),
 			anchor: '100%'
+		}, {
+			xtype: 'checkbox',
+			name: 'overwrite',
+			boxLabel: _('xbuttons_overwrite_file'),
+			checked: false
 		}],
 		keys: [{
 			key: Ext.EventObject.ENTER, shift: true, fn: function () {
@@ -195,7 +214,6 @@ xButtons.window.SelectFiles = function (config) {
 			xtype: 'xbuttons-combo-files',
 			name: 'file',
 			emptyText: _('xbuttons_choose_file'),
-			//style: {marginLeft: '20px'},
 			id: config.id + '-filename-field'
 			,anchor: '100%'
 		}],
