@@ -44,28 +44,23 @@ Ext.extend(xButtons, Ext.Component, {
 		});
 	},
 	save2File:function(){
-		var code = document.getElementById(xButtons_config.field).value;
-
-		Ext.MessageBox.prompt(
-			_('xbuttons_file_name')
-			,_('xbuttons_enter_file_name')
-			,function(b,name) {
-				MODx.Ajax.request({
-					url: xButtons_config.connector_url,
-					params: {
-						action: 'mgr/file/savefile',
-						code: code,
-						file: name,
-						element: xButtons_config.element
-					},
-					listeners: {
-						failure: {fn: function(response) {
-						}, scope: this}
-					}
-				});
-
+		if (this.saveObjectWindow) this.saveObjectWindow.el.remove();
+		this.saveObjectWindow = MODx.load({
+			xtype: 'xbuttons-savecode-window',
+			id: Ext.id(),
+			listeners: {
+				success: {
+					fn: function (response) {
+						if (response.a.result.success) {
+						}
+					}, scope: this
+				},
+				failure: {
+					fn: function(r){}, scope: this
+				}
 			}
-		);
+		});
+		this.saveObjectWindow.show(Ext.EventObject.target);
 	}
 });
 Ext.reg('xbuttons', xButtons);
@@ -141,6 +136,49 @@ Ext.onReady(function() {
 });
 
 /************************************************************/
+xButtons.window.SaveCode = function (config) {
+	config = config || {};
+	//var code = document.getElementsByClassName('ace_text-input')[0].value || document.getElementById(xButtons_config.field).value;
+	var aceEditor = document.getElementsByClassName('ace_editor')[0], code;
+	if (aceEditor) {
+		code = Ext.getCmp(aceEditor.id).getValue();
+	} else {
+		code = document.getElementById(xButtons_config.field).value;
+	}
+
+	Ext.applyIf(config, {
+		width: 300,
+		title: _('xbuttons_file_name'),
+		autoHeight: true,
+		modal: true,
+		url: xButtons_config.connector_url,
+		action: 'mgr/file/savefile',
+		fields: [{
+			xtype: 'hidden',
+			name: 'code',
+			value: code
+		}, {
+			xtype: 'hidden',
+			name: 'element',
+			value: xButtons_config.element
+		}, {
+			xtype: 'textfield',
+			name: 'name',
+			allowBlank: false,
+			fieldLabel: _('xbuttons_enter_file_name'),
+			anchor: '100%'
+		}],
+		keys: [{
+			key: Ext.EventObject.ENTER, shift: true, fn: function () {
+				this.submit()
+			}, scope: this
+		}]
+	});
+	xButtons.window.SaveCode.superclass.constructor.call(this, config);
+};
+Ext.extend(xButtons.window.SaveCode, MODx.Window);
+Ext.reg('xbuttons-savecode-window', xButtons.window.SaveCode);
+
 
 xButtons.window.SelectFiles = function (config) {
 	config = config || {};

@@ -13,3 +13,4 @@ $_lang['xbuttons_err_path_nf'] = 'The path is not found!';
 $_lang['xbuttons_err_file_nf'] = 'The file does not exist!';
 $_lang['xbuttons_err_files_nf'] = 'Did not find any files!';
 $_lang['xbuttons_err_file_ns'] = 'File is not specified!';
+$_lang['xbuttons_err_file_nsp'] = 'Specify the file name!';

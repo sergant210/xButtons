@@ -13,3 +13,4 @@ $_lang['xbuttons_err_path_nf'] = 'Путь не найден!';
 $_lang['xbuttons_err_file_nf'] = 'Файл не найден!';
 $_lang['xbuttons_err_files_nf'] = 'Файлы не найдены!';
 $_lang['xbuttons_err_file_ns'] = 'Файл не выбран!';
+$_lang['xbuttons_err_file_nsp'] = 'Укажите имя файла!';
