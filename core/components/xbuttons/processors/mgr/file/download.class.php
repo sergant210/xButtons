@@ -5,7 +5,7 @@
  */
 class xButtonsDownloadFileProcessor extends modObjectProcessor {
 	public $languageTopics = array('xbuttons');
-	public $permission = 'xbtn_download_file';
+	public $permission = 'xbtn_save_file';
 
     /**
      * @return array|string
