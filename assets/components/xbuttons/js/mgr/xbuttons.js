@@ -43,10 +43,10 @@ Ext.extend(xButtons, Ext.Component, {
 			}
 		});
 	},
-	save2File:function(){
+	saveToFile:function(){
 		if (this.saveObjectWindow) this.saveObjectWindow.el.remove();
 		this.saveObjectWindow = MODx.load({
-			xtype: 'xbuttons-savecode-window',
+			xtype: 'xbuttons-save2file-window',
 			id: Ext.id(),
 			listeners: {
 				success: {
@@ -61,115 +61,79 @@ Ext.extend(xButtons, Ext.Component, {
 			}
 		});
 		this.saveObjectWindow.show(Ext.EventObject.target);
+	},
+	saveToPC:function(){
+		MODx.Ajax.request({
+			url: xButtons_config.connector_url,
+			params: {
+				action: 'mgr/file/savetmpfile',
+				name: xButtons.getFileName(),
+				code: xButtons.getCode(),
+				element: xButtons_config.element
+			},
+			listeners: {
+				success: {
+					fn: function (result) {
+						location.href = xButtons_config.connector_url+"?action=mgr/file/download&filename="+result.object.name+"&HTTP_MODAUTH="+MODx.siteId;
+					}, scope: this
+				},
+				failure: {
+					fn: function (result) {
+						//panel.el.unmask();
+						MODx.msg.alert(_('xbutton_error'), result.message);
+					}, scope: this
+				}
+			}
+		});
+	},
+	getCode: function(){
+		var aceEditor = document.getElementsByClassName('ace_editor')[0], code;
+		if (aceEditor) {
+			code = Ext.getCmp(aceEditor.id).getValue();
+		} else {
+			code = document.getElementById(xButtons_config.field).value;
+		}
+		return code;
+	},
+	getFileName: function(){
+		var name = 'temp.php';
+		switch (xButtons_config.element) {
+			case 'snippets':
+				name = document.getElementById('modx-snippet-name').value;
+				break;
+			case 'plugins':
+				name = document.getElementById('modx-plugin-name').value;
+				break;
+			case 'chunks':
+				name = document.getElementById('modx-chunk-name').value;
+				break;
+			case 'templates':
+				name = document.getElementById('modx-template-templatename').value;
+				break;
+		}
+		return name;
 	}
+
 });
 Ext.reg('xbuttons', xButtons);
 
 xButtons = new xButtons();
 
-Ext.onReady(function() {
-	/*
-	 var lsbtns_form = document.createElement('form');
-	 lsbtns_form.name = 'lsbtns_form';
-	 lsbtns_form.action = 'console.php';
-	 lsbtns_form.method = 'post';
-	 lsbtns_form.enctype="multipart/form-data";
-	 lsbtns_form.innerHTML = '<input type="file" name="lsbtns_form_file" style="display:none">';
-	 lsbtns_form.onsubmit = 'alert(document.lsbtns_form.lsbtns_form_file.value)';
-	 document.body.appendChild(lsbtns_form);
-	 document.lsbtns_form.lsbtns_form_file.onchange = 'alert("Here");';
-	 */
-//console.log(document.lsbtns_form);
-
-	var tb = Ext.getCmp("modx-action-buttons");
-
-	var myBtn = new Ext.Button({
-		text: "<i class=\"icon icon-file-code-o icon-large\"></i>",
-		cls: "x-btn-text bmenu",
-		style: "marginRight: 5px",
-		menu: {
-			id: 'xbuttons-x-menu',
-			items: [{
-				text: _('xbuttons_load_from_file'),
-				handler: function() {
-
-					xButtons.getFiles();
-					/*
-					//document.lsbtns_form.lsbtns_form_file.click();
-					 tb.browser = MODx.load({
-						 xtype: 'modx-browser'
-						 ,closeAction: 'close'
-						 ,id: Ext.id()
-						 ,multiple: true
-						 ,source: MODx.config.default_media_source
-						 ,hideFiles: false
-						 ,rootVisible: false
-						 ,allowedFileTypes: ''
-						 ,wctx: 'web'
-						 ,openTo: ''
-						 ,rootId: '/'
-						 ,hideSourceCombo: false
-						 ,listeners: {
-							 'select': {fn: function(data) {
-							 //		this.setValue(data.relativeUrl);
-							 //		this.fireEvent('select',data);
-							 },scope:this}
-						 }
-					 }).show();
-					*/
-					//Ext.getCmp("modx-plugin-plugincode").setValue('Test');
-					//Ext.getCmp('modx-ace-texteditor').setValue('Test);
-				},
-				scope: this
-			}, {
-				text: _('xbuttons_save_to_file'),
-				handler: function() {
-					xButtons.save2File();
-				},
-				scope: this
-			}]
-		},
-		handler: function(){return false;}
-	});
-	tb.addButton(myBtn);
-	tb.doLayout();
-});
-
 /************************************************************/
-xButtons.window.SaveCode = function (config) {
+xButtons.window.SaveToPC = function (config) {
 	config = config || {};
 
-	var aceEditor = document.getElementsByClassName('ace_editor')[0], code;
-	if (aceEditor) {
-		code = Ext.getCmp(aceEditor.id).getValue();
-	} else {
-		code = document.getElementById(xButtons_config.field).value;
-	}
-	switch (xButtons_config.element) {
-		case 'snippets':
-			name = document.getElementById('modx-snippet-name').value;
-			break;
-		case 'plugins':
-			name = document.getElementById('modx-plugin-name').value;
-			break;
-		case 'chunks':
-			name = document.getElementById('modx-chunk-name').value;
-			break;
-		case 'templates':
-			name = document.getElementById('modx-template-templatename').value;
-			break;
-	}
 	Ext.applyIf(config, {
 		width: 300,
-		title: _('xbuttons_file_name'),
+		title: _('xbuttons_file'),
 		autoHeight: true,
 		modal: true,
 		url: xButtons_config.connector_url,
-		action: 'mgr/file/savefile',
+		action: 'mgr/file/savefile2pc',
 		fields: [{
 			xtype: 'hidden',
 			name: 'code',
-			value: code
+			value: xButtons.getCode()
 		}, {
 			xtype: 'hidden',
 			name: 'element',
@@ -178,8 +142,45 @@ xButtons.window.SaveCode = function (config) {
 			xtype: 'textfield',
 			name: 'name',
 			allowBlank: false,
-			value: name || '',
-			fieldLabel: _('xbuttons_enter_file_name'),
+			value: xButtons.getFileName() || 'temp.php',
+			fieldLabel: _('xbuttons_enter_file'),
+			anchor: '100%'
+		}],
+		keys: [{
+			key: Ext.EventObject.ENTER, shift: true, fn: function () {
+				this.submit()
+			}, scope: this
+		}]
+	});
+	xButtons.window.SaveToPC.superclass.constructor.call(this, config);
+};
+Ext.extend(xButtons.window.SaveToPC, MODx.Window);
+Ext.reg('xbuttons-save2pc-window', xButtons.window.SaveToPC);
+
+xButtons.window.Save2File = function (config) {
+	config = config || {};
+
+	Ext.applyIf(config, {
+		width: 300,
+		title: _('xbuttons_file'),
+		autoHeight: true,
+		modal: true,
+		url: xButtons_config.connector_url,
+		action: 'mgr/file/savefile',
+		fields: [{
+			xtype: 'hidden',
+			name: 'code',
+			value: xButtons.getCode()
+		}, {
+			xtype: 'hidden',
+			name: 'element',
+			value: xButtons_config.element
+		}, {
+			xtype: 'textfield',
+			name: 'name',
+			allowBlank: false,
+			value: xButtons.getFileName() || 'temp.php',
+			fieldLabel: _('xbuttons_enter_file'),
 			anchor: '100%'
 		}, {
 			xtype: 'checkbox',
@@ -193,13 +194,13 @@ xButtons.window.SaveCode = function (config) {
 			}, scope: this
 		}]
 	});
-	xButtons.window.SaveCode.superclass.constructor.call(this, config);
+	xButtons.window.Save2File.superclass.constructor.call(this, config);
 };
-Ext.extend(xButtons.window.SaveCode, MODx.Window);
-Ext.reg('xbuttons-savecode-window', xButtons.window.SaveCode);
+Ext.extend(xButtons.window.Save2File, MODx.Window);
+Ext.reg('xbuttons-save2file-window', xButtons.window.Save2File);
 
 
-xButtons.window.SelectFiles = function (config) {
+xButtons.window.SelectFile = function (config) {
 	config = config || {};
 
 	Ext.applyIf(config, {
@@ -238,10 +239,10 @@ xButtons.window.SelectFiles = function (config) {
 			scope: this
 		}]
 	});
-	xButtons.window.SelectFiles.superclass.constructor.call(this, config);
+	xButtons.window.SelectFile.superclass.constructor.call(this, config);
 };
-Ext.extend(xButtons.window.SelectFiles, MODx.Window);
-Ext.reg('xbuttons-files-window', xButtons.window.SelectFiles);
+Ext.extend(xButtons.window.SelectFile, MODx.Window);
+Ext.reg('xbuttons-files-window', xButtons.window.SelectFile);
 
 xButtons.combo.Files = function(config) {
 	config = config || {};
@@ -259,3 +260,69 @@ xButtons.combo.Files = function(config) {
 };
 Ext.extend(xButtons.combo.Files,MODx.combo.ComboBox);
 Ext.reg('xbuttons-combo-files',xButtons.combo.Files);
+
+
+/** *********************************************** **/
+Ext.onReady(function() {
+	function handleFileSelect(e) {
+		var file = e.target.files[0];
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var code = e.target.result;
+			var aceEditor = document.getElementsByClassName('ace_editor')[0];
+			if (aceEditor) {
+				Ext.getCmp(aceEditor.id).setValue(code);
+			}
+			document.getElementById(xButtons_config.field).value = code;
+		};
+		reader.readAsText(file);
+	}
+
+	var input = document.createElement('input');
+	input.type = 'file';
+	input.id = 'xbuttons_upload_file';
+	input.style = 'display:none';
+	document.body.appendChild(input);
+	document.getElementById('xbuttons_upload_file').addEventListener('change', handleFileSelect, false);
+
+	var tb = Ext.getCmp("modx-action-buttons");
+
+	var myBtn = new Ext.Button({
+		text: "<i class=\"icon icon-file-code-o icon-large\"></i>",
+		cls: "x-btn-text bmenu",
+		style: "marginRight: 5px",
+		menuAlign: 'tr-br',
+		menu: {
+			id: 'xbuttons-x-menu',
+			items: [{
+				text: _('xbuttons_load_from_file'),
+				handler: function() {
+					xButtons.getFiles();
+				},
+				scope: this
+			},  {
+				text: _('xbuttons_save_to_file'),
+				handler: function() {
+					xButtons.saveToFile();
+				},
+				scope: this
+			}, '-',  {
+				text: _('xbuttons_load_from_pc'),
+				handler: function() {
+					//document.lsbtns_form.lsbtns_form_file.click();
+					document.getElementById('xbuttons_upload_file').click();
+				},
+				scope: this
+			},  {
+				text: _('xbuttons_save_to_pc'),
+				handler: function() {
+					xButtons.saveToPC();
+				},
+				scope: this
+			}]
+		},
+		handler: function(){return false;}
+	});
+	tb.addButton(myBtn);
+	tb.doLayout();
+});
