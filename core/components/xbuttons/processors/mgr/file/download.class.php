@@ -1,14 +1,21 @@
 <?php
 
 /**
- * Export selected tables
+ * Download a file
  */
-class xButtonsDownloadFileProcessor extends modObjectProcessor {
-	public $languageTopics = array('xbuttons');
+class xButtonsDownloadFileProcessor extends modProcessor {
 	public $permission = 'xbtn_save_file';
 
     /**
-     * @return array|string
+     * {@inheritdoc}
+     * @return bool
+     */
+    public function checkPermissions() {
+        return !empty($this->permission) ? $this->modx->hasPermission($this->permission) : true;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function process() {
 

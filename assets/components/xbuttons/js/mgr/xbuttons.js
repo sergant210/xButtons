@@ -9,7 +9,8 @@ Ext.extend(xButtons, Ext.Component, {
 			url: xButtons_config.connector_url,
 			params: {
 				action: 'mgr/file/getfiles',
-				element: xButtons_config.element
+				element: xButtons_config.element,
+				prop: prop
 			},
 			listeners: {
 				success: {fn: function(response) {
@@ -20,15 +21,15 @@ Ext.extend(xButtons, Ext.Component, {
 						id: 'xbuttons-files-window',
 						listeners: {
 							success: {
-								fn: function (response) {
-									if (response.a.result.success) {
-										var code = response.a.result.message ? response.a.result.message : '<?php\n';
-										var aceEditor = document.getElementsByClassName('ace_editor')[0];
-										if (aceEditor) {
-											Ext.getCmp(aceEditor.id).setValue(code);
-										}
-										document.getElementById(xButtons_config.field).value = code;
+								fn: function (r) {
+									var response = Ext.decode(r.a.response.responseText),
+										code = response.message ? response.message : '<?php\n',
+										aceEditor = document.getElementsByClassName('ace_editor')[0];
+
+									if (aceEditor) {
+										Ext.getCmp(aceEditor.id).setValue(code);
 									}
+									document.getElementById(xButtons_config.field).value = code;
 								}, scope: this
 							},
 							failure: {
@@ -80,6 +81,28 @@ Ext.extend(xButtons, Ext.Component, {
 				failure: {
 					fn: function (result) {
 						//panel.el.unmask();
+						MODx.msg.alert(_('xbutton_error'), result.message);
+					}, scope: this
+				}
+			}
+		});
+	},
+	saveProp:function(){
+		MODx.Ajax.request({
+			url: xButtons_config.connector_url,
+			params: {
+				action: 'mgr/file/saveproperties',
+				name: xButtons.getFileName(),
+				element: xButtons_config.element
+			},
+			listeners: {
+				success: {
+					fn: function (result) {
+						location.href = xButtons_config.connector_url+"?action=mgr/file/download&filename="+result.object.name+"&HTTP_MODAUTH="+MODx.siteId;
+					}, scope: this
+				},
+				failure: {
+					fn: function (result) {
 						MODx.msg.alert(_('xbutton_error'), result.message);
 					}, scope: this
 				}
@@ -142,7 +165,7 @@ xButtons.window.SaveToPC = function (config) {
 			xtype: 'textfield',
 			name: 'name',
 			allowBlank: false,
-			value: xButtons.getFileName() || 'temp.php',
+			value: xButtons.getFileName() || 'temp',
 			fieldLabel: _('xbuttons_enter_file'),
 			anchor: '100%'
 		}],
@@ -179,8 +202,8 @@ xButtons.window.Save2File = function (config) {
 			xtype: 'textfield',
 			name: 'name',
 			allowBlank: false,
-			value: xButtons.getFileName() || 'temp.php',
-			fieldLabel: _('xbuttons_enter_file'),
+			value: xButtons.getFileName() || 'temp',
+			fieldLabel: _('xbuttons_enter_file_name'),
 			anchor: '100%'
 		}, {
 			xtype: 'checkbox',
@@ -264,7 +287,7 @@ Ext.reg('xbuttons-combo-files',xButtons.combo.Files);
 
 /** *********************************************** **/
 Ext.onReady(function() {
-	function handleFileSelect(e) {
+	function handleFile(e) {
 		var file = e.target.files[0];
 		var reader = new FileReader();
 		reader.onload = function(e) {
@@ -277,13 +300,34 @@ Ext.onReady(function() {
 		};
 		reader.readAsText(file);
 	}
-
-	var input = document.createElement('input');
-	input.type = 'file';
-	input.id = 'xbuttons_upload_file';
-	input.style = 'display:none';
-	document.body.appendChild(input);
-	document.getElementById('xbuttons_upload_file').addEventListener('change', handleFileSelect, false);
+	function handleProperpties(e) {
+		var file = e.target.files[0];
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var code = Ext.decode(e.target.result);
+			var grid = Ext.getCmp('modx-grid-element-properties');
+			if (grid && Ext.isArray(code)) {
+				grid.defaultProperties = code;
+				grid.getStore().loadData(code);
+			}
+			//xButtons.loadProp(code);
+		};
+		reader.readAsText(file);
+	}
+	// Upload file
+	var inputFile = document.createElement('input');
+	inputFile.type = 'file';
+	inputFile.id = 'xbuttons_upload_file';
+	inputFile.style = 'display:none';
+	document.body.appendChild(inputFile);
+	document.getElementById('xbuttons_upload_file').addEventListener('change', handleFile, false);
+	// Upload properties
+	var inputProp = document.createElement('input');
+	inputProp.type = 'file';
+	inputProp.id = 'xbuttons_upload_properties';
+	inputProp.style = 'display:none';
+	document.body.appendChild(inputProp);
+	document.getElementById('xbuttons_upload_properties').addEventListener('change', handleProperpties, false);
 
 	var tb = Ext.getCmp("modx-action-buttons");
 
@@ -309,7 +353,6 @@ Ext.onReady(function() {
 			}, '-',  {
 				text: _('xbuttons_load_from_pc'),
 				handler: function() {
-					//document.lsbtns_form.lsbtns_form_file.click();
 					document.getElementById('xbuttons_upload_file').click();
 				},
 				scope: this
@@ -317,6 +360,18 @@ Ext.onReady(function() {
 				text: _('xbuttons_save_to_pc'),
 				handler: function() {
 					xButtons.saveToPC();
+				},
+				scope: this
+			}, '-',  {
+				text: _('xbuttons_load_prop'),
+				handler: function() {
+					document.getElementById('xbuttons_upload_properties').click();
+				},
+				scope: this
+			},  {
+				text: _('xbuttons_save_prop'),
+				handler: function() {
+					xButtons.saveProp();
 				},
 				scope: this
 			}]

@@ -1,15 +1,26 @@
 <?php
 
-class xButtonsSaveTmpFileProcessor extends modObjectProcessor{
-    public $languageTopics = array('xbuttons');
+class xButtonsSaveTmpFileProcessor extends modProcessor{
     public $permission = 'xbtn_save_file';
 
+    /**
+     * {@inheritdoc}
+     * @return bool
+     */
+    public function checkPermissions() {
+        return !empty($this->permission) ? $this->modx->hasPermission($this->permission) : true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return array|string
+     */
     public function process() {
         $code = trim($this->getProperty('code',''));
+        $prop = $this->getProperty('prop',false);
         $name = basename(trim($this->getProperty('name','')));
         $name = $this->modx->sanitizeString($name);
         if (empty($name)) {
-            $this->addFieldError('name',$this->modx->lexicon('xbuttons_err_file_nsp'));
             return $this->failure($this->modx->lexicon('xbuttons_err_file_nsp'));
         }
         $name = str_replace(' ','_',$name);

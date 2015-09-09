@@ -1,5 +1,9 @@
 Changelog for xButtons.
 
+1.1.0-beta
+==============
+- Save and load element properties.
+
 1.0.0-beta
 ==============
 - Initial release

@@ -13,7 +13,7 @@ if ($object->xpdo) {
             $manager = $modx->getManager();
             $objects = array();
             $schemaFile = MODX_CORE_PATH . 'components/xbuttons/model/schema/xbuttons.mysql.schema.xml';
-            if (is_file($schemaFile)) {
+            if (file($schemaFile)) {
                 $schema = new SimpleXMLElement($schemaFile, 0, true);
                 if (isset($schema->object)) {
                     foreach ($schema->object as $object) {
@@ -21,8 +21,6 @@ if ($object->xpdo) {
                     }
                 }
                 unset($schema);
-            } else {
-                $modx->log(modX::LOG_LEVEL_ERROR, 'Could not get classes from schema file.');
             }
             foreach ($objects as $tmp) {
                 // Operate with tables

@@ -1,6 +1,20 @@
 <?php
 
 class xbuttonsLoadFromFileProcessor extends modProcessor{
+    public $permission = 'xbtn_load_file';
+
+    /**
+     * {@inheritdoc}
+     * @return bool
+     */
+    public function checkPermissions() {
+        return !empty($this->permission) ? $this->modx->hasPermission($this->permission) : true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return array|string
+     */
     public function process() {
         $file = trim($this->getProperty('file',''));
         $element = $this->getProperty('element');
