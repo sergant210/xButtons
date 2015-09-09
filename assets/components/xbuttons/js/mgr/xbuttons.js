@@ -9,8 +9,7 @@ Ext.extend(xButtons, Ext.Component, {
 			url: xButtons_config.connector_url,
 			params: {
 				action: 'mgr/file/getfiles',
-				element: xButtons_config.element,
-				prop: prop
+				element: xButtons_config.element
 			},
 			listeners: {
 				success: {fn: function(response) {

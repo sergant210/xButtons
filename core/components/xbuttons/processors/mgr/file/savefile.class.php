@@ -3,10 +3,17 @@
 class xButtonsSaveToFileProcessor extends modProcessor{
     public $permission = 'xbtn_save_file';
 
+    /**
+     * {@inheritdoc}
+     * @return bool
+     */
     public function checkPermissions() {
         return !empty($this->permission) ? $this->modx->hasPermission($this->permission) : true;
     }
-
+    /**
+     * {@inheritdoc}
+     * @return array|string
+     */
     public function process() {
         $code = trim($this->getProperty('code',''));
         $name = basename(trim($this->getProperty('name','')));
