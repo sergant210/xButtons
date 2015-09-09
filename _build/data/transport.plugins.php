@@ -7,7 +7,10 @@ $tmp = array(
 		'file' => 'xbuttons',
 		'description' => '',
 		'events' => array(
-			'OnPluginFormPrerender' => array()
+			'OnPluginFormPrerender' => array(),
+			'OnChunkFormPrerender' => array(),
+			'OnSnipFormPrerender' => array(),
+			'OnTempFormPrerender' => array()
 		)
 	)
 );
