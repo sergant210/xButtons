@@ -10,7 +10,6 @@ class xButtonsSavePropertiesProcessor extends modProcessor{
     public function process() {
         $name = basename(trim($this->getProperty('name','')));
         $name = $this->modx->sanitizeString($name);
-$this->modx->log(modX::LOG_LEVEL_ERROR, $name);
         if (empty($name)) {
             return $this->failure($this->modx->lexicon('xbuttons_err_file_nsp'));
         }
