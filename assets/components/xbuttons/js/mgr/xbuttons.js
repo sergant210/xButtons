@@ -338,13 +338,13 @@ Ext.onReady(function() {
 		menu: {
 			id: 'xbuttons-x-menu',
 			items: [{
-				text: _('xbuttons_load_from_file'),
+				text: _('xbuttons_load_from_server'),
 				handler: function() {
 					xButtons.getFiles();
 				},
 				scope: this
 			},  {
-				text: _('xbuttons_save_to_file'),
+				text: _('xbuttons_save_to_server'),
 				handler: function() {
 					xButtons.saveToFile();
 				},
