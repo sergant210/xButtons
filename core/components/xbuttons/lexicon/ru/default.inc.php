@@ -3,8 +3,8 @@
 $_lang['xbuttons_close'] = 'Закрыть';
 $_lang['xbuttons_load'] = 'Загрузить';
 $_lang['xbuttons_save'] = 'Сохранить';
-$_lang['xbuttons_load_from_file'] = 'Загрузить из файла';
-$_lang['xbuttons_save_to_file'] = 'Сохранить в файл';
+$_lang['xbuttons_load_from_server'] = 'Загрузить с сервера';
+$_lang['xbuttons_save_to_server'] = 'Сохранить на сервер';
 $_lang['xbuttons_load_from_pc'] = 'Загрузить с ПК';
 $_lang['xbuttons_save_to_pc'] = 'Сохранить на ПК';
 $_lang['xbuttons_choose_file'] = 'Выберите файл';
