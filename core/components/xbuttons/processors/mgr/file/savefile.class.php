@@ -24,8 +24,9 @@ class xButtonsSaveToFileProcessor extends modProcessor{
         }
         $element = $this->getProperty('element','');
         $overwrite = $this->getProperty('overwrite',false);
-        $path = $this->modx->getOption('xbuttons_core_path', NULL, $this->modx->getOption('core_path') . 'components/xbuttons/')."elements/{$element}/";
+        $path = $this->modx->getOption('xbuttons_files_path', NULL, $this->modx->getOption('core_path') . 'components/xbuttons/elements/')."{$element}/";
         if (!is_dir($path) && !mkdir($path,0755)) $this->failure($this->modx->lexicon('xbuttons_err_path_nf'));
+        $ext = '';
         switch ($element) {
             case 'plugins':
             case 'snippets':

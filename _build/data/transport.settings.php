@@ -2,13 +2,12 @@
 
 $settings = array();
 
-$tmp = array(/*
-	'some_setting' => array(
-		'xtype' => 'combo-boolean',
-		'value' => true,
+$tmp = array(
+	'files_path' => array(
+		'xtype' => 'textfield',
+		'value' => '{core_path}components/xbuttons/elements/',
 		'area' => 'xbuttons_main',
 	),
-	*/
 );
 
 foreach ($tmp as $k => $v) {

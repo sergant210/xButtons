@@ -1,5 +1,9 @@
 Changelog for xButtons.
 
+1.1.0-pl
+==============
+- Added a system setting "files_path".
+
 1.1.0-beta
 ==============
 - Save and load element properties.

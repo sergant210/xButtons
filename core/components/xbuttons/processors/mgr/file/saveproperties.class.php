@@ -60,7 +60,13 @@ class xButtonsSavePropertiesProcessor extends modProcessor{
 
 
         $file = $path.'download_file.txt';
-        file_put_contents($file, $this->modx->toJSON($data));
+        //TODO Добавить событие fieldChange
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            file_put_contents($file, json_encode($data, JSON_UNESCAPED_UNICODE));
+        } else {
+            file_put_contents($file, json_encode($data));
+        }
+        //file_put_contents($file, serialize($data));
         $name = substr($element,0,strlen($element)-1).'.'.$name.'_prop.txt';
         $object = array('name'=>$name);
         return $this->success('',$object);
